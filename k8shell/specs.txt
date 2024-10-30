@@ -1,0 +1,13 @@
+uygulama ilk başta .kube dizinindeki config dosyalarına bakacak ve oradakileri listeleyecek
+kullanıcı birden fazla config dosyası seçevilir ve istediği config dosyasını kullanan spring-shell uygulaması farklı pencerede açılır
+
+bu her bir penceredeki işlemler için:
+iki tane config dosyası var diyelim: a ve b
+
+aşağıdaki gibi menü olacak (a) için:
+a#: help
+    list-na
+    list-pods, lp
+    list-services
+    list-deployments
+    list-secrets

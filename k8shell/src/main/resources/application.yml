@@ -1,0 +1,13 @@
+k8s-shell:
+  prompt: "k8s:> "
+  config-path:
+    default: ${user.home}/.kube/config
+logging:
+  level:
+    root: off
+spring:
+  shell:
+    interactive:
+      enabled: on
+  main:
+    web-application-type: none

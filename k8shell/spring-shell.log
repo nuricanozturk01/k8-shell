@@ -1,0 +1,153 @@
+1730267950306:help
+1730267975906:exit
+1730268140821:clear
+1730268141891:ls
+1730268145548:h
+1730268146532:help
+1730269233626:listConfigs
+1730269360099:exit
+1730269368980:list-configs
+1730269591821:navigateConfigs
+1730269612998:list
+1730270858598:help
+1730270894014:clear
+1730270897230:script
+1730270903502:version
+1730270932422:history
+1730270941527:stacktrace
+1730270948190:quitr
+1730270950975:exit
+1730274214538:list-pods
+1730275055793:exit
+1730275278372:list-pods
+1730287793874:list-pod-volume-mounts
+1730287819906:list-pod-volume-mounts --namesapce benimrandevum --podName auth-service-7d5585b5cb-fr8r4
+1730287833131:list-pod-volume-mounts --namespace benimrandevum --podName auth-service-7d5585b5cb-fr8r4
+1730288032148:list-pods
+1730288229959:help
+1730288235526:list-pods
+1730288674680:help
+1730288715151:list-pods
+1730288732872:change-config repsy-new
+1730288736887:list-pods
+1730288756672:change-config ~/.kube/repsy-new
+1730288759343:list-pods
+1730288877735:chage-config --parh
+1730288904136:change-config --path ~/.kube/repsy-new
+1730288908951:clear
+1730288951017:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730288956207:list-pods
+1730290119491:change-config /home/nuricanozturk/.kube/repsy-new
+1730290122602:list-pods
+1730290174291:list pods
+1730290176411:list-pods
+1730290196580:change-config /home/nuricanozturk/.kube/repsy-new
+1730290198987:list-pods
+1730290606384:cchange-config /home/nuricanozturk/.kube/repsy-new
+1730290621697:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730290624120:list-pods
+1730290676065:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730290677920:list-pods
+1730290830083:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730290832978:list-pods
+1730290845635:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730290848186:list-pods
+1730290942812:k8s:>
+1730290945595:list-pods
+1730290982853:chage-config --path /home/nuricanozturk/.kube/repsy-new
+1730290992668:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730290995380:list-pods
+1730291014861:chage-config --path /home/nuricanozturk/.kube/repsy-new
+1730291020845:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291022740:list-pods
+1730291076238:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291083845:list-pods
+1730291133279:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291140893:list-pods
+1730291173841:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291176350:list-pods
+1730291179822:exit
+1730291199071:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291201686:list-pods
+1730291254512:@Scope("singleton")
+1730291257399:list-pods
+1730291288009:@Scope("singleton")
+1730291293608:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291295936:list-pods
+1730291301679:exit
+1730291595268:list-pods
+1730291600316:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291602355:list-pods
+1730291736773:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291738357:list-pods
+1730291838393:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291841126:list-pods
+1730291891336:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291898415:list-pods
+1730291924993:@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+1730291932728:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291936664:list-pods
+1730291954369:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291956015:list-pods
+1730291958464:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291961960:list-pods
+1730291980873:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730291982776:list-pods
+1730292081986:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730292084665:list-pods
+1730292651902:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730292654397:list-pods
+1730292759172:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730292760756:list-podsd
+1730292765540:list-pods
+1730292845749:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730292847404:list-pods
+1730292890852:list pods
+1730292893692:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730292895932:list-pods
+1730293037068:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293038708:list-pods
+1730293571062:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293572749:list-pods
+1730293644791:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293646839:list-pods
+1730293691134:clear
+1730293691944:k8s:> change-config --path /home/nuricanozturk/.kube/repsy-newlist-pods
+1730293701704:change-config --path /home/nuricanozturk/.kube/repsy-newlist-pods
+1730293704719:list-pods
+1730293736023:@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+1730293743480:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293747023:list-pods
+1730293765752:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293767287:list-pods
+1730293780889:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293782583:list-pods
+1730293826617:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293828119:list-pods
+1730293849416:change-config /home/nuricanozturk/.kube/config
+1730293851224:list-pods
+1730293858456:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293860847:list-pods
+1730293902465:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293903888:list-pods
+1730293966178:change-config --path /home/nuricanozturk/.kube/repsy-new
+1730293967656:list-pods
+1730294687927:sc
+1730296896016:set-config
+1730296905465:sc
+1730296956529:component single
+1730297019728:sc
+1730297139537:component single
+1730297180833:component confirmation
+1730297259145:c
+1730297272385:component confirmation
+1730297293433:<dependency>
+1730297293436:<groupId>org.yaml</groupId>
+1730297293437:<artifactId>snakeyaml</artifactId>
+1730297293437:<scope>runtime</scope>
+1730297293438:</dependency>
+1730297296232:sc
+1730297301577:component single
+1730297353273:component confirmation
+1730297451611:component string
+1730299534825:list-pods
