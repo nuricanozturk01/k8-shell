@@ -1,6 +1,6 @@
 # k8-shell
 
-- <img width="500" src="./images/banner.png" alt="banner">
+- <img width="600" src="./images/banner.png" alt="banner">
 
 k8-shell is a simple **read-only** shell script that allows you to interact with your Kubernetes cluster using a
 shell-like interface.
@@ -13,4 +13,4 @@ shell-like interface.
 - Run the java application in the target directory
 
 ## Images
-- <img width="500" src="./images/secret.png" alt="secret">
+- <img width="600" src="./images/secret.png" alt="secret">
