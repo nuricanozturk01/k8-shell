@@ -42,9 +42,7 @@ public class ConfigurationFile extends AbstractShellComponent {
 
     @ShellMethod(key = {"sc", "set-config"}, value = "Change the configuration file")
     public void select() {
-        final var configFiles = getFilesInDir(kubeDirPath);
-
-        final var items = configFiles.stream()
+        final var items = getFilesInDir(kubeDirPath).stream()
                 .map(f -> SelectorItem.of(f.getName(), f.getAbsolutePath()))
                 .toList();
 
