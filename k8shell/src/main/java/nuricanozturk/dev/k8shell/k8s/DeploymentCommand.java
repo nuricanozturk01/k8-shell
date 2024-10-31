@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.util.Yaml;
-import nuricanozturk.dev.k8shell.Calculator;
-import nuricanozturk.dev.k8shell.ComponentProvider;
-import nuricanozturk.dev.k8shell.KubernetesData;
-import nuricanozturk.dev.k8shell.ShellPrinter;
+import nuricanozturk.dev.k8shell.*;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
 import org.fusesource.jansi.Ansi;
 import org.springframework.shell.component.SingleItemSelector;
@@ -34,14 +30,15 @@ import java.util.stream.Collectors;
 public class DeploymentCommand extends AbstractShellComponent {
     private final ShellPrinter shellPrinter;
     private final ComponentProvider componentProvider;
-    private final CoreV1Api coreApi;
     private final AppsV1Api appsApi;
+    private final FileService fileService;
 
-    public DeploymentCommand(ShellPrinter shellPrinter, ComponentProvider componentProvider, CoreV1Api coreApi, AppsV1Api appsApi) {
+    public DeploymentCommand(final ShellPrinter shellPrinter, final ComponentProvider componentProvider,
+                             final AppsV1Api appsApi, final FileService fileService) {
         this.shellPrinter = shellPrinter;
         this.componentProvider = componentProvider;
-        this.coreApi = coreApi;
         this.appsApi = appsApi;
+        this.fileService = fileService;
     }
 
     @ShellMethod(key = {"list deployments", "ld"}, value = "List deployments in the current namespace")
@@ -59,11 +56,11 @@ public class DeploymentCommand extends AbstractShellComponent {
 
     @ShellMethod(key = {"sd", "select deployment"}, value = "Select a deployment", prefix = "-")
     public void selectDeployment(
-            @ShellOption(value = "d", help = "Describe the selected deployment", optOut = true, defaultValue = "false") boolean describe,
-            @ShellOption(value = "o", help = "Output the selected deployment", optOut = true, defaultValue = "") String output,
-            @ShellOption(value = "f", help = "Output format", optOut = true, defaultValue = "yml") String format,
-            @ShellOption(value = "s", help = "Open the selected deployment in the browser", optOut = true, defaultValue = "false") boolean open,
-            @ShellOption(value = "m", help = "Use remembered deployment object", optOut = true, defaultValue = "false") boolean memory
+            @ShellOption(value = "d", help = "Describe the selected deployment", optOut = true, defaultValue = "false") final boolean describe,
+            @ShellOption(value = "o", help = "Output the selected deployment", optOut = true, defaultValue = "") final String output,
+            @ShellOption(value = "f", help = "Output format", optOut = true, defaultValue = "yml") final String format,
+            @ShellOption(value = "s", help = "Open the selected deployment in the browser", optOut = true, defaultValue = "false") final boolean open,
+            @ShellOption(value = "m", help = "Use remembered deployment object", optOut = true, defaultValue = "false") final boolean memory
     ) throws ApiException {
         if (memory) {
             final var selectedDeployment = KubernetesData.getInstance().getDeployment();
@@ -95,7 +92,7 @@ public class DeploymentCommand extends AbstractShellComponent {
         checkAndApplyOptions(selectedDeployment, describe, output, format, open);
     }
 
-    private void checkAndApplyOptions(V1Deployment selectedDeployment, boolean describe, String output, String format, boolean open) {
+    private void checkAndApplyOptions(final V1Deployment selectedDeployment, final boolean describe, final String output, final String format, final boolean open) {
         if (open) {
             openDeploymentWithFormat(selectedDeployment, format);
         }
@@ -109,57 +106,41 @@ public class DeploymentCommand extends AbstractShellComponent {
         }
     }
 
-    public void openDeploymentWithFormat(V1Deployment selectedDeployment, String format) {
+    public void openDeploymentWithFormat(final V1Deployment selectedDeployment, final String format) {
         try {
-            var fileFormat = "yaml";
-            if (format == null || format.isBlank() || (!format.equalsIgnoreCase("json") && !format.equalsIgnoreCase("yaml") && !format.equalsIgnoreCase("yml"))) {
-                throw new IllegalArgumentException("Invalid format. Use 'json' or 'yaml'");
-            } else {
-                fileFormat = format.toLowerCase();
-            }
+            var fileFormat = fileService.checkFileFormat(format) ? format : "yaml";
             if (fileFormat.equals("json")) {
-                ObjectMapper jsonMapper = new ObjectMapper();
-                String jsonOutput = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDeployment);
-                System.out.println("JSON Output:\n" + jsonOutput);
+                final var jsonMapper = new ObjectMapper();
+                jsonMapper.registerModule(new JavaTimeModule());
+                jsonMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                final var jsonOutput = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDeployment);
+                shellPrinter.print("JSON Output:\n" + jsonOutput, Ansi.Color.GREEN);
             } else {
-                String yamlOutput = Yaml.dump(selectedDeployment);
-                System.out.println("YAML Output:\n" + yamlOutput);
+                final var yamlOutput = Yaml.dump(selectedDeployment);
+                shellPrinter.print("YAML Output:\n" + yamlOutput, Ansi.Color.GREEN);
             }
         } catch (Exception e) {
-            System.err.println("Error printing deployment: " + e.getMessage());
+            shellPrinter.printError("An error occurred while opening the deployment: " + e.getMessage());
         }
     }
 
-    public void exportDeployment(V1Deployment deployment, String format, String output) {
+    public void exportDeployment(final V1Deployment deployment, final String format, final String output) {
         try {
-            // Dosya formatını belirle
-            var fileFormat = "yaml";
-            if (format == null || format.isBlank() || (!format.equalsIgnoreCase("json") && !format.equalsIgnoreCase("yaml") && !format.equalsIgnoreCase("yml"))) {
-                throw new IllegalArgumentException("Invalid format. Use 'json' or 'yaml'");
-            } else {
-                fileFormat = format.toLowerCase();
-            }
+            var fileFormat = fileService.checkFileFormat(format) ? format : "yaml";
 
-            // ObjectMapper'ı oluştur ve JSR310 modülünü ekle
-            ObjectMapper mapper;
-            if (fileFormat.equals("json")) {
-                mapper = new ObjectMapper();
-            } else {
-                mapper = new ObjectMapper(new YAMLFactory());
-            }
+            final var mapper = fileFormat.equals("json") ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
 
-            // Java 8 tarih/saat türlerini desteklemek için JavaTimeModule ekleyin
             mapper.registerModule(new JavaTimeModule());
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            // Deployment nesnesini belirtilen dosya yoluna yazdır
             mapper.writeValue(new File(output), deployment);
-            System.out.println("Deployment exported successfully to " + fileFormat.toUpperCase() + " format at: " + output);
+
+            shellPrinter.printSuccess("Deployment exported successfully to " + fileFormat.toUpperCase() + " format at: " + output);
         } catch (IOException e) {
-            System.out.println("An error occurred while exporting the deployment: " + e.getMessage());
+            shellPrinter.printError("An error occurred while exporting the deployment: " + e.getMessage());
         }
     }
 
+    @SuppressWarnings("all")
     private void printDescribe(V1Deployment deployment) {
         // Metadata
         shellPrinter.print("Name: ", deployment.getMetadata().getName());
@@ -201,7 +182,7 @@ public class DeploymentCommand extends AbstractShellComponent {
         }
     }
 
-    private String[] toRow(V1Deployment v1Deployment) {
+    private String[] toRow(final V1Deployment v1Deployment) {
         final var metadata = v1Deployment.getMetadata();
         final var status = v1Deployment.getStatus();
         final var spec = v1Deployment.getSpec();
