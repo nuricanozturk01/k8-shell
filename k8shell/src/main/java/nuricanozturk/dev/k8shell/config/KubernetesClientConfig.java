@@ -3,9 +3,11 @@ package nuricanozturk.dev.k8shell.config;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
 
+import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.util.Config;
 
+import nuricanozturk.dev.k8shell.KubernetesData;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +37,14 @@ public class KubernetesClientConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public CoreV1Api getConfiguration(@Qualifier(BEAN_API_CLIENT) ApiClient client) {
+    public CoreV1Api getCoreV1API(@Qualifier(BEAN_API_CLIENT) ApiClient client) {
+        KubernetesData.getInstance().setConfigPath(propertyService.getProperty());
         return new CoreV1Api(client);
+    }
+
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public AppsV1Api getAppsV1API(@Qualifier(BEAN_API_CLIENT) ApiClient client) {
+        return new AppsV1Api(client);
     }
 }
