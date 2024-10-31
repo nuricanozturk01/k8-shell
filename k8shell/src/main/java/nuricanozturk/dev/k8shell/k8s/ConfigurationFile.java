@@ -2,11 +2,13 @@ package nuricanozturk.dev.k8shell.k8s;
 
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
+import nuricanozturk.dev.k8shell.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.KubernetesData;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
 import nuricanozturk.dev.k8shell.config.PropertyService;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
 
+import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.shell.component.SingleItemSelector;
@@ -19,6 +21,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static nuricanozturk.dev.k8shell.config.KubernetesClientConfig.BEAN_API_CLIENT;
 
@@ -26,13 +29,15 @@ import static nuricanozturk.dev.k8shell.config.KubernetesClientConfig.BEAN_API_C
 public class ConfigurationFile extends AbstractShellComponent {
     private final PropertyService propertyService;
     private final ApplicationContext context;
+    private final CommandlinePrinter commandlinePrinter;
 
     @Value("${k8s-shell.config-path.dir}")
     private String kubeDirPath;
 
-    public ConfigurationFile(final PropertyService propertyService, final ApplicationContext context) {
+    public ConfigurationFile(final PropertyService propertyService, final ApplicationContext context, CommandlinePrinter commandlinePrinter) {
         this.propertyService = propertyService;
         this.context = context;
+        this.commandlinePrinter = commandlinePrinter;
     }
 
     @ShellMethod(key = {"sc", "set-config"}, value = "Change the configuration file")
@@ -65,24 +70,17 @@ public class ConfigurationFile extends AbstractShellComponent {
         Configuration.setDefaultApiClient(newClient);
     }
 
-    @ShellMethod(key = {"list-config", "cc"}, value = "Show the current configuration files in .kube directory")
+    @ShellMethod(key = {"list config", "lc"}, value = "Show the current configuration files in .kube directory")
     public void list() {
         final var configFiles = getFilesInDir(kubeDirPath);
 
+        final var headers = List.of("Configuration Files");
         final var items = configFiles.stream()
-                .map(f -> SelectorItem.of(f.getName(), f.getAbsolutePath()))
-                .toList();
+                .map(f -> new String[]{f.getName()})
+                .collect(Collectors.toList());
 
-        final var context = new ComponentProvider.SingleSelectionBuilder<String>()
-                .setTerminal(getTerminal())
-                .setResourceLoader(getResourceLoader())
-                .setTemplateExecutor(getTemplateExecutor())
-                .setItems(items)
-                .setMessage("Configuration files")
-                .setPrintResults(true)
-                .build();
-
-        context.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        final var renderedTable = new ComponentProvider().renderTable(headers, items);
+        commandlinePrinter.print(renderedTable, Ansi.Color.GREEN);
     }
 
     private List<File> getFilesInDir(final String dirPath) {
