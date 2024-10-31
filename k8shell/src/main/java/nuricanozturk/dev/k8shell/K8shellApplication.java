@@ -9,8 +9,7 @@ import org.springframework.shell.standard.ShellCommandGroup;
 @SpringBootApplication
 public class K8shellApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(K8shellApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(K8shellApplication.class, args);
+    }
 }

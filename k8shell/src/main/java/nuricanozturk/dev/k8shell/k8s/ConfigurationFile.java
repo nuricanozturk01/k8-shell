@@ -8,9 +8,18 @@ import nuricanozturk.dev.k8shell.config.PropertyService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.support.SelectorItem;
+import org.springframework.shell.component.view.TerminalUI;
+import org.springframework.shell.component.view.TerminalUIBuilder;
+import org.springframework.shell.component.view.control.BoxView;
+import org.springframework.shell.component.view.control.ListView;
+import org.springframework.shell.component.view.event.KeyEvent;
+import org.springframework.shell.context.InteractionMode;
+import org.springframework.shell.geom.HorizontalAlign;
+import org.springframework.shell.geom.VerticalAlign;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.table.*;
 
 import java.io.File;
 import java.util.Arrays;
@@ -60,7 +69,7 @@ public class ConfigurationFile extends AbstractShellComponent {
         KubernetesData.getInstance().setNamespace(null);
     }
 
-    @ShellMethod(key = {"list namespaces", "set-namespaces", "sn"}, value = "Change namespace")
+    @ShellMethod(key = {"change namespaces", "set-namespaces", "sn"}, value = "Change namespace")
     public void changeNamespace() throws Exception {
         final var namespaces = api.listNamespace().executeWithHttpInfo();
 
@@ -85,6 +94,24 @@ public class ConfigurationFile extends AbstractShellComponent {
 
         KubernetesData.getInstance().setNamespace(namespace);
         System.out.println("Namespace set to: " + namespace);
+    }
+
+    @ShellMethod(key = {"ln", "list namespaces"}, interactionMode = InteractionMode.INTERACTIVE, value = "List namespaces")
+    public void listNamespaces() throws Exception {
+        final var namespaces = api.listNamespace().executeWithHttpInfo();
+        if (namespaces.getData() == null) {
+            System.out.println("No namespaces found.");
+        }
+        final var items = namespaces.getData().getItems().stream()
+                .map(n -> new String[]{"- ", n.getMetadata().getName()})
+                .toArray(String[][]::new);
+
+        final var tableModel = new ArrayTableModel(items);
+        final var tableBuilder = new TableBuilder(tableModel);
+        tableBuilder.addFullBorder(BorderStyle.fancy_light);
+        tableBuilder.on(CellMatchers.column(0)).addSizer(new AbsoluteWidthSizeConstraints(2));
+
+
     }
 
 }
