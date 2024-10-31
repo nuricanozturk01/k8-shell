@@ -4,6 +4,8 @@
 k8-shell is a simple **read-only** shell script that allows you to interact with your Kubernetes cluster using a
 shell-like interface.
 
+- **_It is written to easily access the Kubernetes information I need. Suitable for personal use._**
+
 ## Installation
 
 - Clone the repository
