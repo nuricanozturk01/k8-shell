@@ -10,22 +10,17 @@
     </parent>
     <groupId>nuricanozturk.dev</groupId>
     <artifactId>k8shell</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>k8shell</name>
     <description>k8shell</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
+
     <developers>
-        <developer/>
+        <developer>
+            <name>Nuri Can Ozturk</name>
+            <email>canozturk309@gmail.com</email>
+        </developer>
     </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+
     <properties>
         <java.version>21</java.version>
         <spring-shell.version>3.3.3</spring-shell.version>
@@ -69,7 +64,6 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.13.3</version>
         </dependency>
-
 
 
         <dependency>
