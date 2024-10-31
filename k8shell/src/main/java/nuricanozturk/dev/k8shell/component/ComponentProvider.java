@@ -1,4 +1,4 @@
-package nuricanozturk.dev.k8shell;
+package nuricanozturk.dev.k8shell.component;
 
 import org.jline.terminal.Terminal;
 import org.springframework.core.io.ResourceLoader;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 public class ComponentProvider {
-    public String toTable(List<String> headers, List<String[]> items) {
+    public String renderTable(final List<String> headers, final List<String[]> items) {
         items.addFirst(headers.toArray(String[]::new));
 
         final var arrayTableModel = new ArrayTableModel(items.toArray(String[][]::new));
@@ -29,7 +29,6 @@ public class ComponentProvider {
         private Terminal terminal;
         private List<SelectorItem<T>> items;
         private String message;
-        private String defaultItem;
         private ResourceLoader resourceLoader;
         private TemplateExecutor templateExecutor;
         private boolean printResults = true;
@@ -38,40 +37,35 @@ public class ComponentProvider {
 
         }
 
-        public SingleSelectionBuilder<T> setTerminal(Terminal terminal) {
+        public SingleSelectionBuilder<T> setTerminal(final Terminal terminal) {
             this.terminal = terminal;
             return this;
         }
 
 
-        public SingleSelectionBuilder<T> setResourceLoader(ResourceLoader resourceLoader) {
+        public SingleSelectionBuilder<T> setResourceLoader(final ResourceLoader resourceLoader) {
             this.resourceLoader = resourceLoader;
             return this;
         }
 
-        public SingleSelectionBuilder<T> setTemplateExecutor(TemplateExecutor templateExecutor) {
+        public SingleSelectionBuilder<T> setTemplateExecutor(final TemplateExecutor templateExecutor) {
             this.templateExecutor = templateExecutor;
             return this;
         }
 
-        public SingleSelectionBuilder<T> setPrintResults(boolean printResults) {
+        public SingleSelectionBuilder<T> setPrintResults(final boolean printResults) {
             this.printResults = printResults;
             return this;
         }
 
-        public SingleSelectionBuilder<T> setItems(List<SelectorItem<T>> items) {
+        public SingleSelectionBuilder<T> setItems(final List<SelectorItem<T>> items) {
             this.items = items;
 
             return this;
         }
 
-        public SingleSelectionBuilder<T> setMessage(String message) {
+        public SingleSelectionBuilder<T> setMessage(final String message) {
             this.message = message;
-            return this;
-        }
-
-        public SingleSelectionBuilder<T> setDefaultItem(String defaultItem) {
-            this.defaultItem = defaultItem;
             return this;
         }
 

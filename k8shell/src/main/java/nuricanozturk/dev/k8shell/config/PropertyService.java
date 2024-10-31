@@ -9,15 +9,15 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PropertyService {
     private final AtomicReference<String> configPath;
 
-    public PropertyService(@Value("${k8s-shell.config-path.default}") String configPath) {
+    public PropertyService(@Value("${k8s-shell.config-path.default}") final String configPath) {
         this.configPath = new AtomicReference<>(configPath);
     }
 
-    public void updateProperty(String value) {
+    public void setConfigPath(final String value) {
         configPath.set(value);
     }
 
-    public String getProperty() {
+    public String getConfigPath() {
         return configPath.get();
     }
 }

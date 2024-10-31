@@ -8,8 +8,8 @@ import io.kubernetes.client.openapi.models.V1Service;
 import java.util.*;
 
 public final class KubernetesData {
-
     private static final KubernetesData INSTANCE = new KubernetesData();
+
     private String namespace;
     private String configPath;
     private V1Pod pod;
@@ -20,7 +20,6 @@ public final class KubernetesData {
     private KubernetesData() {
     }
 
-    // Thread-safe singleton
     public static KubernetesData getInstance() {
         return INSTANCE;
     }
@@ -29,7 +28,7 @@ public final class KubernetesData {
         return deployment;
     }
 
-    public void setDeployment(V1Deployment deployment) {
+    public void setDeployment(final V1Deployment deployment) {
         this.deployment = deployment;
     }
 
@@ -37,7 +36,7 @@ public final class KubernetesData {
         return secret;
     }
 
-    public void setSecret(V1Secret secret) {
+    public void setSecret(final V1Secret secret) {
         this.secret = secret;
     }
 
@@ -45,7 +44,7 @@ public final class KubernetesData {
         return service;
     }
 
-    public void setService(V1Service service) {
+    public void setService(final V1Service service) {
         this.service = service;
     }
 
@@ -53,7 +52,7 @@ public final class KubernetesData {
         return pod;
     }
 
-    public void setPod(V1Pod pod) {
+    public void setPod(final V1Pod pod) {
         this.pod = pod;
     }
 
@@ -61,7 +60,7 @@ public final class KubernetesData {
         return namespace;
     }
 
-    public void setNamespace(String namespace) {
+    public void setNamespace(final String namespace) {
         this.namespace = namespace;
     }
 
@@ -69,13 +68,11 @@ public final class KubernetesData {
         return configPath;
     }
 
-    public void setConfigPath(String configPath) {
+    public void setConfigPath(final String configPath) {
         this.configPath = configPath;
     }
 
     public List<String[]> getAllData() {
-        // Return mutable list
-
         final var podName = Optional.ofNullable(pod).map(p -> p.getMetadata().getName()).orElse("N/A");
         final var serviceName = Optional.ofNullable(service).map(s -> s.getMetadata().getName()).orElse("N/A");
         final var deploymentName = Optional.ofNullable(deployment).map(d -> d.getMetadata().getName()).orElse("N/A");
@@ -93,7 +90,6 @@ public final class KubernetesData {
         );
     }
 
-
     public void clearData() {
         this.configPath = null;
         this.namespace = null;
@@ -101,5 +97,13 @@ public final class KubernetesData {
         this.service = null;
         this.deployment = null;
         this.secret = null;
+    }
+
+    public void changeNamespace(final String selectedNamespace) {
+        KubernetesData.getInstance().setPod(null);
+        KubernetesData.getInstance().setSecret(null);
+        KubernetesData.getInstance().setService(null);
+        KubernetesData.getInstance().setDeployment(null);
+        KubernetesData.getInstance().setNamespace(selectedNamespace);
     }
 }

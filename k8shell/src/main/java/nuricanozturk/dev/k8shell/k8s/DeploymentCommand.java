@@ -1,24 +1,17 @@
 package nuricanozturk.dev.k8shell.k8s;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
-import io.kubernetes.client.util.Yaml;
 import nuricanozturk.dev.k8shell.*;
+import nuricanozturk.dev.k8shell.component.ComponentProvider;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
+import nuricanozturk.dev.k8shell.util.Calculator;
 import org.fusesource.jansi.Ansi;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.*;
 
-import java.io.File;
-
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -28,14 +21,17 @@ import java.util.stream.Collectors;
 @ShellComponent
 @ShellCommandGroup("Kubernetes Deployment Commands")
 public class DeploymentCommand extends AbstractShellComponent {
-    private final ShellPrinter shellPrinter;
+
+    private final CommandlinePrinter commandlinePrinter;
     private final ComponentProvider componentProvider;
     private final AppsV1Api appsApi;
     private final FileService fileService;
 
-    public DeploymentCommand(final ShellPrinter shellPrinter, final ComponentProvider componentProvider,
-                             final AppsV1Api appsApi, final FileService fileService) {
-        this.shellPrinter = shellPrinter;
+    public DeploymentCommand(final CommandlinePrinter commandlinePrinter,
+                             final ComponentProvider componentProvider,
+                             final AppsV1Api appsApi,
+                             final FileService fileService) {
+        this.commandlinePrinter = commandlinePrinter;
         this.componentProvider = componentProvider;
         this.appsApi = appsApi;
         this.fileService = fileService;
@@ -43,15 +39,11 @@ public class DeploymentCommand extends AbstractShellComponent {
 
     @ShellMethod(key = {"list deployments", "ld"}, value = "List deployments in the current namespace")
     public void listDeployments() throws ApiException {
-        final var deployments = getDeployments();
-
         final var headers = List.of("Namespace", "Name", "Ready", "Up-to-date", "Available", "Age");
-        final var items = deployments.stream()
-                .map(this::toRow)
-                .collect(Collectors.toList());
+        final var items = getDeployments().stream().map(this::toRow).collect(Collectors.toList());
 
-        final var result = componentProvider.toTable(headers, items);
-        shellPrinter.print(result, Ansi.Color.GREEN);
+        final var renderedTable = componentProvider.renderTable(headers, items);
+        commandlinePrinter.print(renderedTable, Ansi.Color.GREEN);
     }
 
     @ShellMethod(key = {"sd", "select deployment"}, value = "Select a deployment", prefix = "-")
@@ -65,6 +57,7 @@ public class DeploymentCommand extends AbstractShellComponent {
         if (memory) {
             final var selectedDeployment = KubernetesData.getInstance().getDeployment();
             checkAndApplyOptions(selectedDeployment, describe, output, format, open);
+            return;
         }
 
         final var deploymentSelectorItemList = getDeployments().stream()
@@ -77,7 +70,6 @@ public class DeploymentCommand extends AbstractShellComponent {
                 .setTemplateExecutor(getTemplateExecutor())
                 .setItems(deploymentSelectorItemList)
                 .setMessage("Select a secret")
-                .setDefaultItem(null)
                 .setPrintResults(false)
                 .build();
 
@@ -87,14 +79,18 @@ public class DeploymentCommand extends AbstractShellComponent {
                 .orElseThrow(() -> new ItemNotFoundException("No deployment selected."));
 
         KubernetesData.getInstance().setDeployment(selectedDeployment);
-        shellPrinter.printSuccess("Deployment is selected: " + Objects.requireNonNull(selectedDeployment.getMetadata()).getName());
+        commandlinePrinter.printSuccess("Deployment is selected: " + Objects.requireNonNull(selectedDeployment.getMetadata()).getName());
 
         checkAndApplyOptions(selectedDeployment, describe, output, format, open);
     }
 
-    private void checkAndApplyOptions(final V1Deployment selectedDeployment, final boolean describe, final String output, final String format, final boolean open) {
+    private void checkAndApplyOptions(final V1Deployment selectedDeployment,
+                                      final boolean describe,
+                                      final String output,
+                                      final String format,
+                                      final boolean open) {
         if (open) {
-            openDeploymentWithFormat(selectedDeployment, format);
+            commandlinePrinter.printKubernetesObject(selectedDeployment, format);
         }
 
         if (describe) {
@@ -102,82 +98,44 @@ public class DeploymentCommand extends AbstractShellComponent {
         }
 
         if (output != null && !output.isEmpty() && !output.isBlank()) {
-            exportDeployment(selectedDeployment, format, output);
-        }
-    }
-
-    public void openDeploymentWithFormat(final V1Deployment selectedDeployment, final String format) {
-        try {
-            var fileFormat = fileService.checkFileFormat(format) ? format : "yaml";
-            if (fileFormat.equals("json")) {
-                final var jsonMapper = new ObjectMapper();
-                jsonMapper.registerModule(new JavaTimeModule());
-                jsonMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                final var jsonOutput = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDeployment);
-                shellPrinter.print("JSON Output:\n" + jsonOutput, Ansi.Color.GREEN);
-            } else {
-                final var yamlOutput = Yaml.dump(selectedDeployment);
-                shellPrinter.print("YAML Output:\n" + yamlOutput, Ansi.Color.GREEN);
-            }
-        } catch (Exception e) {
-            shellPrinter.printError("An error occurred while opening the deployment: " + e.getMessage());
-        }
-    }
-
-    public void exportDeployment(final V1Deployment deployment, final String format, final String output) {
-        try {
-            var fileFormat = fileService.checkFileFormat(format) ? format : "yaml";
-
-            final var mapper = fileFormat.equals("json") ? new ObjectMapper() : new ObjectMapper(new YAMLFactory());
-
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            mapper.writeValue(new File(output), deployment);
-
-            shellPrinter.printSuccess("Deployment exported successfully to " + fileFormat.toUpperCase() + " format at: " + output);
-        } catch (IOException e) {
-            shellPrinter.printError("An error occurred while exporting the deployment: " + e.getMessage());
+            fileService.exportKubernetesObjectWithFormat(selectedDeployment, format, output);
         }
     }
 
     @SuppressWarnings("all")
-    private void printDescribe(V1Deployment deployment) {
-        // Metadata
-        shellPrinter.print("Name: ", deployment.getMetadata().getName());
-        shellPrinter.print("Namespace: ", deployment.getMetadata().getNamespace());
-        shellPrinter.print("Labels: ", deployment.getMetadata().getLabels().toString());
-        shellPrinter.print("Annotations: ", deployment.getMetadata().getAnnotations().toString());
-        shellPrinter.print("Selector: ", deployment.getSpec().getSelector().getMatchLabels().toString());
+    private void printDescribe(final V1Deployment deployment) {
+        commandlinePrinter.print("Name: ", deployment.getMetadata().getName());
+        commandlinePrinter.print("Namespace: ", deployment.getMetadata().getNamespace());
+        commandlinePrinter.print("Labels: ", deployment.getMetadata().getLabels().toString());
+        commandlinePrinter.print("Annotations: ", deployment.getMetadata().getAnnotations().toString());
+        commandlinePrinter.print("Selector: ", deployment.getSpec().getSelector().getMatchLabels().toString());
 
-        // Spec
-        shellPrinter.print("\nReplicas: ", Optional.ofNullable(deployment.getSpec().getReplicas()).orElse(0).toString());
-        shellPrinter.print("Strategy: ", deployment.getSpec().getStrategy().getType());
+        commandlinePrinter.print("\nReplicas: ", Optional.ofNullable(deployment.getSpec().getReplicas()).orElse(0).toString());
+        commandlinePrinter.print("Strategy: ", deployment.getSpec().getStrategy().getType());
 
-        // Pod Template
         final var template = deployment.getSpec().getTemplate();
-        shellPrinter.print("\nPod Template:", Ansi.Color.GREEN);
-        shellPrinter.print("  Containers:", Ansi.Color.GREEN);
+        commandlinePrinter.print("\nPod Template:", Ansi.Color.GREEN);
+        commandlinePrinter.print("  Containers:", Ansi.Color.GREEN);
         template.getSpec().getContainers().forEach(container -> {
-            shellPrinter.print("    Name: ", container.getName());
-            shellPrinter.print("    Image: ", container.getImage());
-            shellPrinter.print("    Ports: ", container.getPorts().toString());
-            shellPrinter.print("    Resources: ", container.getResources().toString());
+            commandlinePrinter.print("    Name: ", container.getName());
+            commandlinePrinter.print("    Image: ", container.getImage());
+            commandlinePrinter.print("    Ports: ", container.getPorts().toString());
+            commandlinePrinter.print("    Resources: ", container.getResources().toString());
         });
 
-        // Status
         final var status = deployment.getStatus();
-        shellPrinter.print("\nStatus:", Ansi.Color.GREEN);
-        shellPrinter.print("  Available Replicas: ", Optional.ofNullable(status.getAvailableReplicas()).orElse(0).toString());
-        shellPrinter.print("  Ready Replicas: ", Optional.ofNullable(status.getReadyReplicas()).orElse(0).toString());
-        shellPrinter.print("  Updated Replicas: ", Optional.ofNullable(status.getUpdatedReplicas()).orElse(0).toString());
-        shellPrinter.print("  Conditions:", Ansi.Color.GREEN);
+        commandlinePrinter.print("\nStatus:", Ansi.Color.GREEN);
+        commandlinePrinter.print("  Available Replicas: ", Optional.ofNullable(status.getAvailableReplicas()).orElse(0).toString());
+        commandlinePrinter.print("  Ready Replicas: ", Optional.ofNullable(status.getReadyReplicas()).orElse(0).toString());
+        commandlinePrinter.print("  Updated Replicas: ", Optional.ofNullable(status.getUpdatedReplicas()).orElse(0).toString());
+        commandlinePrinter.print("  Conditions:", Ansi.Color.GREEN);
 
         for (var condition : status.getConditions()) {
-            shellPrinter.print("    Type: ", condition.getType());
-            shellPrinter.print("    Status: ", condition.getStatus());
-            shellPrinter.print("    Last Transition Time: ", Objects.requireNonNull(condition.getLastTransitionTime()).format(DateTimeFormatter.ISO_DATE_TIME));
-            shellPrinter.print("    Reason: ", condition.getReason());
-            shellPrinter.print("    Message: ", condition.getMessage());
+            commandlinePrinter.print("    Type: ", condition.getType());
+            commandlinePrinter.print("    Status: ", condition.getStatus());
+            commandlinePrinter.print("    Last Transition Time: ", Objects.requireNonNull(condition.getLastTransitionTime()).format(DateTimeFormatter.ISO_DATE_TIME));
+            commandlinePrinter.print("    Reason: ", condition.getReason());
+            commandlinePrinter.print("    Message: ", condition.getMessage());
             System.out.println();
         }
     }

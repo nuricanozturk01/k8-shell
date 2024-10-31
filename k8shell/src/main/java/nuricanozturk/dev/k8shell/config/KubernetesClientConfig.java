@@ -22,14 +22,14 @@ public class KubernetesClientConfig {
     public static final String BEAN_API_CLIENT = "API_CLIENT";
     private final PropertyService propertyService;
 
-    public KubernetesClientConfig(PropertyService propertyService) {
+    public KubernetesClientConfig(final PropertyService propertyService) {
         this.propertyService = propertyService;
     }
 
     @Bean(BEAN_API_CLIENT)
     @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public ApiClient getApiClient() throws IOException {
-        var client = Config.fromConfig(propertyService.getProperty());
+        var client = Config.fromConfig(propertyService.getConfigPath());
         client.setVerifyingSsl(false);
         Configuration.setDefaultApiClient(client);
         return client;
@@ -38,7 +38,7 @@ public class KubernetesClientConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public CoreV1Api getCoreV1API(@Qualifier(BEAN_API_CLIENT) ApiClient client) {
-        KubernetesData.getInstance().setConfigPath(propertyService.getProperty());
+        KubernetesData.getInstance().setConfigPath(propertyService.getConfigPath());
         return new CoreV1Api(client);
     }
 

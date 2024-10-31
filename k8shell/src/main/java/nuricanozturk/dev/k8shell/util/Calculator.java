@@ -1,4 +1,4 @@
-package nuricanozturk.dev.k8shell;
+package nuricanozturk.dev.k8shell.util;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -7,10 +7,10 @@ public final class Calculator {
     private Calculator() {
     }
 
-    public static String calculateAge(OffsetDateTime creationTimestamp) {
+    public static String calculateAge(final OffsetDateTime creationTimestamp) {
         final var age = Duration.between(creationTimestamp, OffsetDateTime.now());
 
-        String ageDisplay;
+        final String ageDisplay;
         if (age.getSeconds() < 60) {
             ageDisplay = age.getSeconds() + " seconds ago";
         } else if (age.toMinutes() < 60) {
@@ -20,7 +20,6 @@ public final class Calculator {
         } else {
             ageDisplay = age.toDays() + " days ago";
         }
-
         return ageDisplay;
     }
 }
