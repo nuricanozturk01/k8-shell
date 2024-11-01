@@ -17,6 +17,7 @@ import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
 import java.io.File;
 import java.util.Arrays;
@@ -46,9 +47,17 @@ public class ConfigurationFile extends AbstractShellComponent {
         this.commandlinePrinter = commandlinePrinter;
     }
 
-    @ShellMethod(key = {"sc", "set-config"}, value = "Change the configuration file")
-    public void select() {
-        System.out.println("kubeDirPath: " + kubeDirPath);
+    @ShellMethod(key = {"sc", "set-config"}, value = "Change the configuration file", prefix = "-")
+    public void select(
+            @ShellOption(value = "w", help = "Using wsl", optOut = true, defaultValue = "false") final boolean wsl,
+            @ShellOption(value = "p", help = "Path to the configuration file", defaultValue = "", optOut = true) final String path
+    ) {
+        if (wsl) {
+            kubeDirPath = kubeDirPath.replace("/", "\\");
+        }
+        if (!path.isEmpty()) {
+            kubeDirPath = path;
+        }
         final var items = getFilesInDir(kubeDirPath).stream()
                 .map(f -> SelectorItem.of(f.getName(), f.getAbsolutePath()))
                 .toList();
