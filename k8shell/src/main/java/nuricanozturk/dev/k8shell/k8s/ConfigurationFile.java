@@ -41,7 +41,9 @@ public class ConfigurationFile extends AbstractShellComponent {
         kubeDirPath = kubeDirPath.replace("/", File.separator);
     }
 
-    public ConfigurationFile(final PropertyService propertyService, final ApplicationContext context, CommandlinePrinter commandlinePrinter) {
+    public ConfigurationFile(final PropertyService propertyService,
+                             final ApplicationContext context,
+                             final CommandlinePrinter commandlinePrinter) {
         this.propertyService = propertyService;
         this.context = context;
         this.commandlinePrinter = commandlinePrinter;

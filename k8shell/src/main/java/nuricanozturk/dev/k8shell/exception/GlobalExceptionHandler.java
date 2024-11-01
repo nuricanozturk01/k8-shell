@@ -11,7 +11,7 @@ public class GlobalExceptionHandler implements CommandExceptionResolver {
 
     @ExceptionResolver({ApiException.class, ItemNotFoundException.class})
     @Override
-    public CommandHandlingResult resolve(Exception ex) {
+    public CommandHandlingResult resolve(final Exception ex) {
         return switch (ex) {
             case ApiException e -> CommandHandlingResult.of("\u001B[31m" + e.getMessage() + "\u001B[0m\n");
             case ItemNotFoundException e -> CommandHandlingResult.of("\u001B[31m" + e.getMessage() + "\u001B[0m\n");

@@ -37,14 +37,14 @@ public class KubernetesClientConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public CoreV1Api getCoreV1API(@Qualifier(BEAN_API_CLIENT) ApiClient client) {
+    public CoreV1Api getCoreV1API(@Qualifier(BEAN_API_CLIENT) final ApiClient client) {
         KubernetesData.getInstance().setConfigPath(propertyService.getConfigPath());
         return new CoreV1Api(client);
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public AppsV1Api getAppsV1API(@Qualifier(BEAN_API_CLIENT) ApiClient client) {
+    public AppsV1Api getAppsV1API(@Qualifier(BEAN_API_CLIENT) final ApiClient client) {
         return new AppsV1Api(client);
     }
 }

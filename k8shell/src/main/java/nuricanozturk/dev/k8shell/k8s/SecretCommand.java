@@ -49,10 +49,10 @@ public class SecretCommand extends AbstractShellComponent {
 
     @ShellMethod(key = {"ss", "select secret"}, value = "Select a secret", prefix = "-")
     public void selectSecret(
-            @ShellOption(value = "d", help = "Decode base64 encoded data", optOut = true, defaultValue = "false") boolean decode64,
-            @ShellOption(value = "t", help = "List decoded secrets in a table", optOut = true, defaultValue = "false") boolean showTable,
-            @ShellOption(value = "s", help = "List decoded secrets like string", optOut = true, defaultValue = "false") boolean showText,
-            @ShellOption(value = "r", help = "Use memorized secret", defaultValue = "false", optOut = true) boolean remember
+            @ShellOption(value = "d", help = "Decode base64 encoded data", optOut = true, defaultValue = "false") final boolean decode64,
+            @ShellOption(value = "t", help = "List decoded secrets in a table", optOut = true, defaultValue = "false") final boolean showTable,
+            @ShellOption(value = "s", help = "List decoded secrets like string", optOut = true, defaultValue = "false") final boolean showText,
+            @ShellOption(value = "r", help = "Use memorized secret", defaultValue = "false", optOut = true) final boolean remember
     ) throws ApiException {
 
         if (remember) {
@@ -96,7 +96,7 @@ public class SecretCommand extends AbstractShellComponent {
         }
     }
 
-    private void decodeAndPrintSecret(final V1Secret selectedSecret, boolean showTable, boolean showText) {
+    private void decodeAndPrintSecret(final V1Secret selectedSecret, final boolean showTable, final boolean showText) {
         final var decodedSecrets = getDecodedSecrets(selectedSecret);
         if (showTable) {
             final var headers = List.of("Key", "Value");
