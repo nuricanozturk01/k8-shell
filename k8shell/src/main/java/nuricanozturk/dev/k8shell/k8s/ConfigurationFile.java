@@ -49,15 +49,12 @@ public class ConfigurationFile extends AbstractShellComponent {
 
     @ShellMethod(key = {"sc", "set-config"}, value = "Change the configuration file", prefix = "-")
     public void select(
-            @ShellOption(value = "w", help = "Using wsl", optOut = true, defaultValue = "false") final boolean wsl,
             @ShellOption(value = "p", help = "Path to the configuration file", defaultValue = "", optOut = true) final String path
     ) {
-        if (wsl) {
-            kubeDirPath = kubeDirPath.replace("/", "\\");
-        }
         if (!path.isEmpty()) {
             kubeDirPath = path;
         }
+
         final var items = getFilesInDir(kubeDirPath).stream()
                 .map(f -> SelectorItem.of(f.getName(), f.getAbsolutePath()))
                 .toList();
