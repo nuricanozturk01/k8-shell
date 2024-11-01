@@ -1,10 +1,14 @@
 # k8-shell
+
 <img width="600" src="./images/banner.png" alt="banner">
 
 k8-shell is a simple **read-only** shell script that allows you to interact with your Kubernetes cluster using a
 shell-like interface.
 
 - **_It is written to easily access the Kubernetes information I need. Suitable for personal use._**
+- **If you are using Windows, you can use the *`WSL2 with ubuntu`* and select configuration path using `sc -p <path>`
+  like
+  `sc -p /mnt/c/nuri/.kube`**
 
 ## Installation
 
@@ -14,11 +18,15 @@ shell-like interface.
 - Run the java application in the target directory
 
 ## Video
+
 https://github.com/user-attachments/assets/cc2d3e51-b8ba-4c67-a0c4-5de640ddf16e
+
 ## Images
+
 - <img width="600" src="./images/secret.png" alt="secret">
 
 ## Commands
+
 ```bash
 k8s-shell> help
 AVAILABLE COMMANDS
@@ -28,8 +36,8 @@ Built-In Commands
        stacktrace: Display the full stacktrace of the last error.
        clear: Clear the shell screen.
        quit, exit: Exit the shell.
-       completion bash: Generate bash completion script
        completion zsh: Generate zsh completion script
+       completion bash: Generate bash completion script
        history: Display or save the history of previously run commands
        version: Show version info
        script: Read and execute commands from a file.
