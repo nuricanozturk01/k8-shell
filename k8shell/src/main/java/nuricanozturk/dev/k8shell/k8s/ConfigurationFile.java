@@ -2,6 +2,7 @@ package nuricanozturk.dev.k8shell.k8s;
 
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
+import jakarta.annotation.PostConstruct;
 import nuricanozturk.dev.k8shell.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.KubernetesData;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
@@ -34,6 +35,11 @@ public class ConfigurationFile extends AbstractShellComponent {
     @Value("${k8s-shell.config-path.dir}")
     private String kubeDirPath;
 
+    @PostConstruct
+    public void init() {
+        kubeDirPath = kubeDirPath.replace("/", File.separator);
+    }
+
     public ConfigurationFile(final PropertyService propertyService, final ApplicationContext context, CommandlinePrinter commandlinePrinter) {
         this.propertyService = propertyService;
         this.context = context;
@@ -42,6 +48,7 @@ public class ConfigurationFile extends AbstractShellComponent {
 
     @ShellMethod(key = {"sc", "set-config"}, value = "Change the configuration file")
     public void select() {
+        System.out.println("kubeDirPath: " + kubeDirPath);
         final var items = getFilesInDir(kubeDirPath).stream()
                 .map(f -> SelectorItem.of(f.getName(), f.getAbsolutePath()))
                 .toList();
