@@ -1,0 +1,28 @@
+application:
+  title: k8-shell
+  author: nuricanozturk01
+  version: 1.0.0
+  description: "Read-only shell for Kubernetes with basic commands"
+
+k8s-shell:
+  prompt: "k8s-shell> "
+  config-path:
+    dir: ${user.home}/.kube
+    default: ${user.home}/.kube/config
+logging:
+  level:
+    root: off
+spring:
+  shell:
+    interactive:
+      enabled: on
+    command:
+      help:
+        enabled: true
+      completion:
+        root-command: true
+    history:
+      enabled: true
+      name: ${user.home}/.k8s-shell-history
+  main:
+    web-application-type: none

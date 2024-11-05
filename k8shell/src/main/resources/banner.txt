@@ -1,0 +1,8 @@
+${AnsiColor.GREEN}  _      ___               _            _  _
+${AnsiColor.GREEN} | |    / _ \             | |          | || |
+${AnsiColor.GREEN} | | __| (_) |______  ___ | |__    ___ | || |
+${AnsiColor.GREEN} | |/ / > _ <|______|/ __|| '_ \  / _ \| || |
+${AnsiColor.GREEN} |   < | (_) |       \__ \| | | ||  __/| || |
+${AnsiColor.GREEN} |_|\_\ \___/        |___/|_| |_| \___||_||_|
+${AnsiColor.GREEN}${application.title} v${application.version} [${application.description}]
+${AnsiColor.GREEN}created by:${AnsiColor.BLUE} ${application.author}
