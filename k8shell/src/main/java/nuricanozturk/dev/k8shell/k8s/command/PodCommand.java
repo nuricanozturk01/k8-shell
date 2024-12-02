@@ -1,9 +1,9 @@
-package nuricanozturk.dev.k8shell.k8s;
+package nuricanozturk.dev.k8shell.k8s.command;
 
 import io.kubernetes.client.openapi.models.V1ContainerStatus;
 import io.kubernetes.client.openapi.models.V1Pod;
-import nuricanozturk.dev.k8shell.KubernetesData;
-import nuricanozturk.dev.k8shell.CommandlinePrinter;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.printer.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
 import org.fusesource.jansi.Ansi;
@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static nuricanozturk.dev.k8shell.util.Command.*;
+import static nuricanozturk.dev.k8shell.k8s.CommandInfo.*;
 
 @ShellComponent
 @ShellCommandGroup("Kubernetes Commands")

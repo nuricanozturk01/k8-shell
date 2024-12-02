@@ -1,14 +1,14 @@
-package nuricanozturk.dev.k8shell.k8s;
+package nuricanozturk.dev.k8shell.k8s.command;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Secret;
-import nuricanozturk.dev.k8shell.util.Calculator;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
-import nuricanozturk.dev.k8shell.KubernetesData;
-import nuricanozturk.dev.k8shell.CommandlinePrinter;
+import nuricanozturk.dev.k8shell.k8s.AgeCalculator;
+import nuricanozturk.dev.k8shell.k8s.CommandInfo;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.printer.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
-import nuricanozturk.dev.k8shell.util.Command;
 import org.fusesource.jansi.Ansi;
 import org.springframework.shell.component.SingleItemSelector.SingleItemSelectorContext;
 import org.springframework.shell.component.support.SelectorItem;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static java.nio.ByteBuffer.wrap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
-import static nuricanozturk.dev.k8shell.util.Command.*;
+import static nuricanozturk.dev.k8shell.k8s.CommandInfo.*;
 
 @ShellComponent
 @ShellCommandGroup("Kubernetes Secret Commands")
@@ -51,23 +51,23 @@ public class SecretCommand extends AbstractShellComponent {
 
     @ShellMethod(key = {SELECT_SECRET_SHORT_CMD, SELECT_SECRET_LONG_CMD}, value = SELECT_SECRET_HELP, prefix = "-")
     public void selectSecret(
-            @ShellOption(value = {Command.DECODE_BASE64_SHORT_CMD, Command.DECODE_BASE64_LONG_CMD},
-                    help = Command.DECODE_BASE64_HELP,
+            @ShellOption(value = {CommandInfo.DECODE_BASE64_SHORT_CMD, CommandInfo.DECODE_BASE64_LONG_CMD},
+                    help = CommandInfo.DECODE_BASE64_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean decode64,
 
-            @ShellOption(value = {Command.SHOW_TABLE_SHORT_CMD, Command.SHOW_TABLE_LONG_CMD},
-                    help = Command.SHOW_TABLE_HELP,
+            @ShellOption(value = {CommandInfo.SHOW_TABLE_SHORT_CMD, CommandInfo.SHOW_TABLE_LONG_CMD},
+                    help = CommandInfo.SHOW_TABLE_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean showTable,
 
-            @ShellOption(value = {Command.SHOW_TEXT_SHORT_CMD, Command.SHOW_TEXT_LONG_CMD},
-                    help = Command.SHOW_TEXT_HELP,
+            @ShellOption(value = {CommandInfo.SHOW_TEXT_SHORT_CMD, CommandInfo.SHOW_TEXT_LONG_CMD},
+                    help = CommandInfo.SHOW_TEXT_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean showText,
 
-            @ShellOption(value = {Command.REMEMBER_SECRET_SHORT_CMD, Command.REMEMBER_SECRET_LONG_CMD},
-                    help = Command.REMEMBER_SECRET_HELP,
+            @ShellOption(value = {CommandInfo.REMEMBER_SECRET_SHORT_CMD, CommandInfo.REMEMBER_SECRET_LONG_CMD},
+                    help = CommandInfo.REMEMBER_SECRET_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean remember
 
@@ -142,7 +142,7 @@ public class SecretCommand extends AbstractShellComponent {
     }
 
     private String[] toRow(final V1Secret secret) {
-        final var secretAge = Calculator.calculateAge(Objects.requireNonNull(secret.getMetadata()).getCreationTimestamp());
+        final var secretAge = AgeCalculator.calculate(Objects.requireNonNull(secret.getMetadata()).getCreationTimestamp());
 
         return new String[]{
                 Objects.requireNonNull(secret.getMetadata()).getNamespace(),

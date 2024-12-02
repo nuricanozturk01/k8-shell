@@ -1,10 +1,10 @@
-package nuricanozturk.dev.k8shell.k8s;
+package nuricanozturk.dev.k8shell.k8s.command;
 
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
 import jakarta.annotation.PostConstruct;
-import nuricanozturk.dev.k8shell.CommandlinePrinter;
-import nuricanozturk.dev.k8shell.KubernetesData;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.printer.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
 import nuricanozturk.dev.k8shell.config.PropertyService;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
@@ -26,10 +26,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static nuricanozturk.dev.k8shell.config.KubernetesClientConfig.BEAN_API_CLIENT;
-import static nuricanozturk.dev.k8shell.util.Command.*;
+import static nuricanozturk.dev.k8shell.k8s.CommandInfo.*;
 
 @ShellComponent
-public class ConfigurationFile extends AbstractShellComponent {
+public class ConfigurationFileCommand extends AbstractShellComponent {
     private final PropertyService propertyService;
     private final ApplicationContext context;
     private final CommandlinePrinter commandlinePrinter;
@@ -43,9 +43,9 @@ public class ConfigurationFile extends AbstractShellComponent {
         kubeDirPath = kubeDirPath.replace("/", File.separator);
     }
 
-    public ConfigurationFile(final PropertyService propertyService,
-                             final ApplicationContext context,
-                             final CommandlinePrinter commandlinePrinter) {
+    public ConfigurationFileCommand(final PropertyService propertyService,
+                                    final ApplicationContext context,
+                                    final CommandlinePrinter commandlinePrinter) {
         this.propertyService = propertyService;
         this.context = context;
         this.commandlinePrinter = commandlinePrinter;

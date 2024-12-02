@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+#Ignore .DS_Store files all directories
+**/.DS_Store
+.DS_Store

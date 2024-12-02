@@ -1,4 +1,4 @@
-package nuricanozturk.dev.k8shell;
+package nuricanozturk.dev.k8shell.k8s;
 
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Pod;

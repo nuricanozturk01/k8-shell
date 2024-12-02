@@ -1,17 +1,23 @@
-package nuricanozturk.dev.k8shell;
+package nuricanozturk.dev.k8shell.printer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.util.Yaml;
-import nuricanozturk.dev.k8shell.util.FormatValidator;
+import nuricanozturk.dev.k8shell.file.FileService;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CommandlinePrinter {
+
+    private final FileService fileService;
+
+    public CommandlinePrinter(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     public void print(final String message) {
         System.out.println(message);
@@ -43,7 +49,7 @@ public class CommandlinePrinter {
 
     public void printKubernetesObject(final KubernetesObject selectedDeployment, final String format) {
         try {
-            var fileFormat = FormatValidator.checkFileFormat(format) ? format : "yaml";
+            var fileFormat = fileService.checkFormat(format) ? format : "yaml";
             if (fileFormat.equals("json")) {
                 final var jsonMapper = new ObjectMapper();
                 jsonMapper.registerModule(new JavaTimeModule());

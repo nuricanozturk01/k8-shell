@@ -1,27 +1,28 @@
-package nuricanozturk.dev.k8shell.k8s;
+package nuricanozturk.dev.k8shell.k8s.command;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServicePort;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
-import nuricanozturk.dev.k8shell.FileService;
-import nuricanozturk.dev.k8shell.KubernetesData;
-import nuricanozturk.dev.k8shell.CommandlinePrinter;
+import nuricanozturk.dev.k8shell.file.FileService;
+import nuricanozturk.dev.k8shell.k8s.AgeCalculator;
+import nuricanozturk.dev.k8shell.k8s.CommandInfo;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.printer.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
-import nuricanozturk.dev.k8shell.util.Calculator;
-import nuricanozturk.dev.k8shell.util.Command;
 import org.fusesource.jansi.Ansi;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.*;
+
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static nuricanozturk.dev.k8shell.util.Command.*;
+import static nuricanozturk.dev.k8shell.k8s.CommandInfo.*;
 
 @ShellComponent
 @ShellCommandGroup("Kubernetes Service Commands")
@@ -66,39 +67,39 @@ public class ServiceCommand extends AbstractShellComponent {
                 Objects.requireNonNull(spec.getPorts()).stream()
                         .map(p -> p.getPort() + "/" + p.getProtocol())
                         .collect(Collectors.joining(", ")),
-                Calculator.calculateAge(metadata.getCreationTimestamp())
+                AgeCalculator.calculate(metadata.getCreationTimestamp())
         };
     }
 
     @ShellMethod(key = {SELECT_SERVICE_SHORT_CMD, SELECT_SERVICE_LONG_CMD}, value = SELECT_SERVICE_HELP, prefix = "-")
     public void select(
-            @ShellOption(value = {Command.DESCRIBE_SERVICE_SHORT_CMD, Command.DESCRIBE_SERVICE_LONG_CMD},
-                    help = Command.DESCRIBE_SERVICE_HELP,
+            @ShellOption(value = {CommandInfo.DESCRIBE_SERVICE_SHORT_CMD, CommandInfo.DESCRIBE_SERVICE_LONG_CMD},
+                    help = CommandInfo.DESCRIBE_SERVICE_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean describe,
 
-            @ShellOption(value = {Command.OUTPUT_SERVICE_SHORT_CMD, Command.OUTPUT_SERVICE_LONG_CMD},
-                    help = Command.OUTPUT_SERVICE_HELP,
+            @ShellOption(value = {CommandInfo.OUTPUT_SERVICE_SHORT_CMD, CommandInfo.OUTPUT_SERVICE_LONG_CMD},
+                    help = CommandInfo.OUTPUT_SERVICE_HELP,
                     optOut = true,
                     defaultValue = "") final String output,
 
-            @ShellOption(value = {Command.FORMAT_SERVICE_SHORT_CMD, Command.FORMAT_SERVICE_LONG_CMD},
-                    help = Command.FORMAT_SERVICE_HELP,
+            @ShellOption(value = {CommandInfo.FORMAT_SERVICE_SHORT_CMD, CommandInfo.FORMAT_SERVICE_LONG_CMD},
+                    help = CommandInfo.FORMAT_SERVICE_HELP,
                     optOut = true,
                     defaultValue = "yml") final String format,
 
-            @ShellOption(value = {Command.OPEN_SERVICE_SHORT_CMD, Command.OPEN_SERVICE_LONG_CMD},
-                    help = Command.OPEN_SERVICE_HELP,
+            @ShellOption(value = {CommandInfo.OPEN_SERVICE_SHORT_CMD, CommandInfo.OPEN_SERVICE_LONG_CMD},
+                    help = CommandInfo.OPEN_SERVICE_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean open,
 
-            @ShellOption(value = {Command.NAMESPACE_SERVICE_SHORT_CMD, Command.NAMESPACE_SERVICE_LONG_CMD},
-                    help = Command.NAMESPACE_SERVICE_HELP,
+            @ShellOption(value = {CommandInfo.NAMESPACE_SERVICE_SHORT_CMD, CommandInfo.NAMESPACE_SERVICE_LONG_CMD},
+                    help = CommandInfo.NAMESPACE_SERVICE_HELP,
                     optOut = true,
                     defaultValue = "") final String namespace,
 
-            @ShellOption(value = {Command.MEMORY_SERVICE_SHORT_CMD, Command.MEMORY_SERVICE_LONG_CMD},
-                    help = Command.MEMORY_SERVICE_HELP,
+            @ShellOption(value = {CommandInfo.MEMORY_SERVICE_SHORT_CMD, CommandInfo.MEMORY_SERVICE_LONG_CMD},
+                    help = CommandInfo.MEMORY_SERVICE_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean memory
 
@@ -109,7 +110,7 @@ public class ServiceCommand extends AbstractShellComponent {
             return;
         }
 
-        final var namespaceOpt = Optional.ofNullable(namespace).filter(s -> !s.isEmpty() && !s.isBlank());
+        final var namespaceOpt = Optional.ofNullable(namespace).filter(s -> !s.isBlank());
         final var serviceSelectorItemList = getServices(namespaceOpt).stream()
                 .map(s -> SelectorItem.of(Objects.requireNonNull(s.getMetadata()).getName(), s))
                 .collect(Collectors.toList());
@@ -143,8 +144,8 @@ public class ServiceCommand extends AbstractShellComponent {
             printDescribe(service);
         }
 
-        if (output != null && !output.isEmpty() && !output.isBlank()) {
-            fileService.exportKubernetesObjectWithFormat(service, format, output);
+        if (output != null && !output.isBlank()) {
+            writeFile(service, format, output);
         }
     }
 
@@ -187,5 +188,15 @@ public class ServiceCommand extends AbstractShellComponent {
         }
 
         return serviceList;
+    }
+
+    private void writeFile(final V1Service service, final String format, final String output) {
+        final var fileWriteResponse = fileService.exportKubernetesObjectWithFormat(service, format, output);
+
+        if (fileWriteResponse.containsKey(true)) {
+            commandlinePrinter.printSuccess(fileWriteResponse.get(true));
+        } else {
+            commandlinePrinter.printError(fileWriteResponse.get(false));
+        }
     }
 }

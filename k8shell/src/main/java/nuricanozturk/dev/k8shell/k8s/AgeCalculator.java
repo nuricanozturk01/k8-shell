@@ -1,13 +1,13 @@
-package nuricanozturk.dev.k8shell.util;
+package nuricanozturk.dev.k8shell.k8s;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
-public final class Calculator {
-    private Calculator() {
+public final class AgeCalculator {
+    private AgeCalculator() {
     }
 
-    public static String calculateAge(final OffsetDateTime creationTimestamp) {
+    public static String calculate(final OffsetDateTime creationTimestamp) {
         final var age = Duration.between(creationTimestamp, OffsetDateTime.now());
 
         final String ageDisplay;

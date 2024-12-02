@@ -1,13 +1,15 @@
-package nuricanozturk.dev.k8shell.k8s;
+package nuricanozturk.dev.k8shell.k8s.command;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
-import nuricanozturk.dev.k8shell.*;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
-import nuricanozturk.dev.k8shell.util.Calculator;
-import nuricanozturk.dev.k8shell.util.Command;
+import nuricanozturk.dev.k8shell.file.FileService;
+import nuricanozturk.dev.k8shell.k8s.AgeCalculator;
+import nuricanozturk.dev.k8shell.k8s.CommandInfo;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.printer.CommandlinePrinter;
 import org.fusesource.jansi.Ansi;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.support.SelectorItem;
@@ -19,7 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static nuricanozturk.dev.k8shell.util.Command.*;
+import static nuricanozturk.dev.k8shell.k8s.CommandInfo.*;
 
 @ShellComponent
 @ShellCommandGroup("Kubernetes Deployment Commands")
@@ -51,28 +53,28 @@ public class DeploymentCommand extends AbstractShellComponent {
 
     @ShellMethod(key = {SELECT_DEPLOYMENT_SHORT_CMD, SELECT_DEPLOYMENT_LONG_CMD}, value = SELECT_DEPLOYMENT_HELP, prefix = "-")
     public void selectDeployment(
-            @ShellOption(value = {Command.DESCRIBE_DEPLOYMENT_SHORT_CMD, Command.DESCRIBE_DEPLOYMENT_LONG_CMD},
-                    help = Command.DESCRIBE_DEPLOYMENT_HELP,
+            @ShellOption(value = {CommandInfo.DESCRIBE_DEPLOYMENT_SHORT_CMD, CommandInfo.DESCRIBE_DEPLOYMENT_LONG_CMD},
+                    help = CommandInfo.DESCRIBE_DEPLOYMENT_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean describe,
 
-            @ShellOption(value = {Command.OUTPUT_DEPLOYMENT_SHORT_CMD, Command.OUTPUT_DEPLOYMENT_LONG_CMD},
-                    help = Command.OUTPUT_DEPLOYMENT_HELP,
+            @ShellOption(value = {CommandInfo.OUTPUT_DEPLOYMENT_SHORT_CMD, CommandInfo.OUTPUT_DEPLOYMENT_LONG_CMD},
+                    help = CommandInfo.OUTPUT_DEPLOYMENT_HELP,
                     optOut = true,
                     defaultValue = "") final String output,
 
-            @ShellOption(value = {Command.FORMAT_DEPLOYMENT_SHORT_CMD, Command.FORMAT_DEPLOYMENT_LONG_CMD},
-                    help = Command.FORMAT_DEPLOYMENT_HELP,
+            @ShellOption(value = {CommandInfo.FORMAT_DEPLOYMENT_SHORT_CMD, CommandInfo.FORMAT_DEPLOYMENT_LONG_CMD},
+                    help = CommandInfo.FORMAT_DEPLOYMENT_HELP,
                     optOut = true,
                     defaultValue = "yml") final String format,
 
-            @ShellOption(value = {Command.OPEN_DEPLOYMENT_SHORT_CMD, Command.OPEN_DEPLOYMENT_LONG_CMD},
-                    help = Command.OPEN_DEPLOYMENT_HELP,
+            @ShellOption(value = {CommandInfo.OPEN_DEPLOYMENT_SHORT_CMD, CommandInfo.OPEN_DEPLOYMENT_LONG_CMD},
+                    help = CommandInfo.OPEN_DEPLOYMENT_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean open,
 
-            @ShellOption(value = {Command.MEMORY_DEPLOYMENT_SHORT_CMD, Command.MEMORY_DEPLOYMENT_LONG_CMD},
-                    help = Command.MEMORY_DEPLOYMENT_HELP,
+            @ShellOption(value = {CommandInfo.MEMORY_DEPLOYMENT_SHORT_CMD, CommandInfo.MEMORY_DEPLOYMENT_LONG_CMD},
+                    help = CommandInfo.MEMORY_DEPLOYMENT_HELP,
                     optOut = true,
                     defaultValue = "false") final boolean memory
 
@@ -120,8 +122,8 @@ public class DeploymentCommand extends AbstractShellComponent {
             printDescribe(selectedDeployment);
         }
 
-        if (output != null && !output.isEmpty() && !output.isBlank()) {
-            fileService.exportKubernetesObjectWithFormat(selectedDeployment, format, output);
+        if (output != null && !output.isBlank()) {
+            writeFile(selectedDeployment, format, output);
         }
     }
 
@@ -167,7 +169,7 @@ public class DeploymentCommand extends AbstractShellComponent {
         final var metadata = v1Deployment.getMetadata();
         final var status = v1Deployment.getStatus();
         final var spec = v1Deployment.getSpec();
-        final var age = Calculator.calculateAge(Objects.requireNonNull(metadata).getCreationTimestamp());
+        final var age = AgeCalculator.calculate(Objects.requireNonNull(metadata).getCreationTimestamp());
 
         return new String[]{
                 metadata.getNamespace(),
@@ -194,5 +196,15 @@ public class DeploymentCommand extends AbstractShellComponent {
         }
 
         return deploymentList;
+    }
+
+    private void writeFile(final V1Deployment deployment, final String format, final String output) {
+        final var fileWriteResponse = fileService.exportKubernetesObjectWithFormat(deployment, format, output);
+
+        if (fileWriteResponse.containsKey(true)) {
+            commandlinePrinter.printSuccess(fileWriteResponse.get(true));
+        } else {
+            commandlinePrinter.printError(fileWriteResponse.get(false));
+        }
     }
 }

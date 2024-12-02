@@ -1,10 +1,10 @@
-package nuricanozturk.dev.k8shell.k8s;
+package nuricanozturk.dev.k8shell.k8s.command;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import nuricanozturk.dev.k8shell.component.ComponentProvider;
-import nuricanozturk.dev.k8shell.KubernetesData;
-import nuricanozturk.dev.k8shell.CommandlinePrinter;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.printer.CommandlinePrinter;
 import nuricanozturk.dev.k8shell.exception.ItemNotFoundException;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.support.SelectorItem;
@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static nuricanozturk.dev.k8shell.util.Command.*;
+import static nuricanozturk.dev.k8shell.k8s.CommandInfo.*;
 
 @ShellComponent
 @ShellCommandGroup("Namespace Commands")
@@ -35,7 +35,7 @@ public class NamespaceCommand extends AbstractShellComponent {
     public void changeNamespace(
             @ShellOption(value = "n", help = "Namespace name", optOut = true, defaultValue = "") final String namespace
     ) throws ApiException {
-        if (!namespace.isEmpty() && !namespace.isBlank()) {
+        if (!namespace.isBlank()) {
             KubernetesData.getInstance().changeNamespace(namespace);
             commandlinePrinter.printSuccess("Namespace selected: " + namespace);
             return;

@@ -1,7 +1,7 @@
 package nuricanozturk.dev.k8shell.config;
 
-import nuricanozturk.dev.k8shell.KubernetesData;
-import nuricanozturk.dev.k8shell.util.Command;
+import nuricanozturk.dev.k8shell.k8s.KubernetesData;
+import nuricanozturk.dev.k8shell.k8s.CommandInfo;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,13 +17,13 @@ public class GlobalCommandInterceptor {
     private static final List<String> ALLOWED_COMMANDS = List.of(
             "help",
             "exit",
-            Command.SHOW_INFO_KEY_SHORT,
-            Command.SHOW_INFO_KEY_LONG,
-            Command.EXIT_KEY,
-            Command.SELECT_CONFIG_SHORT_CMD,
-            Command.SELECT_CONFIG_LONG_CMD,
-            Command.LIST_CONFIG_SHORT_CMD,
-            Command.LIST_CONFIG_LONG_CMD
+            CommandInfo.SHOW_INFO_KEY_SHORT,
+            CommandInfo.SHOW_INFO_KEY_LONG,
+            CommandInfo.EXIT_KEY,
+            CommandInfo.SELECT_CONFIG_SHORT_CMD,
+            CommandInfo.SELECT_CONFIG_LONG_CMD,
+            CommandInfo.LIST_CONFIG_SHORT_CMD,
+            CommandInfo.LIST_CONFIG_LONG_CMD
     );
 
     @Around(value = "@annotation(shellMethod)", argNames = "point,shellMethod")
@@ -43,7 +43,7 @@ public class GlobalCommandInterceptor {
 
     private void checkIsExistsConfigFile(String ignored) {
         final var path = KubernetesData.getInstance().getConfigPath();
-        if (path == null || path.isBlank() || path.isEmpty()) {
+        if (path == null || path.isBlank()) {
             throw new IllegalStateException("Configuration file is not selected. Please select a configuration file.");
         }
     }

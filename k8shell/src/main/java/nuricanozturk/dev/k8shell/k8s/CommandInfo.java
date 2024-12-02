@@ -1,8 +1,8 @@
-package nuricanozturk.dev.k8shell.util;
+package nuricanozturk.dev.k8shell.k8s;
 
-public final class Command {
+public final class CommandInfo {
 
-    private Command() {
+    private CommandInfo() {
     }
 
     // SELECT_CONFIG

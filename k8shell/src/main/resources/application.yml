@@ -5,7 +5,7 @@ application:
   description: "Read-only shell for Kubernetes with basic commands"
 
 k8s-shell:
-  prompt: "k8s-shell> "
+  prompt: "k8-shell> "
   config-path:
     dir: ${user.home}/.kube
     default: ${user.home}/.kube/config
@@ -23,6 +23,6 @@ spring:
         root-command: true
     history:
       enabled: true
-      name: ${user.home}/.k8s-shell-history
+      name: ${user.home}/.k8-shell-history
   main:
     web-application-type: none
