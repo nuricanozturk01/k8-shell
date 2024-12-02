@@ -6,10 +6,14 @@ k8-shell is a simple **read-only** shell script that allows you to interact with
 shell-like interface.
 
 - **_It is written to easily access the Kubernetes information I need. Suitable for personal use._**
+- **I recommend using a Unix-based operating system to run this application**
 - **If you are using Windows, you can use the *`WSL2 with ubuntu`* and select configuration path using `sc -p <path>`
   like
   `sc -p /mnt/c/nuri/.kube`**
-
+## PreRequisites
+- Java 21
+- GraalVM native image
+- kubectl
 ## Installation
 
 - Clone the repository
